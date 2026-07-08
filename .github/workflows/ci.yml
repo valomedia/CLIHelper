@@ -31,6 +31,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  build:
+    name: Build
+    if: >-
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Build package
+        run: mvn -B --no-transfer-progress -DskipTests package
+
   unit-tests:
     name: Unit tests
     if: >-
